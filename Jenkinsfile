@@ -1,42 +1,17 @@
+properties([parameters([choice(choices: 'main \n feature-1\nfeature-2', name: 'build')])])
+
 pipeline {
     agent any
 
-    tools {
-        maven "maven3.8.6"
-        jdk "java1.8"
-    }
-
     stages {
-        stage('Initialize'){
-            steps{
-                echo "PATH = ${M2_HOME}/bin:${PATH}"
-                echo "M2_HOME = /opt/maven"
-            }
-        }
-        stage('Checkout') {
+        stage ('Compile Stage') {
+
             steps {
+                echo "Pulling changes from branch ${params.build}"
                 git changelog: false, credentialsId: 'GitID', poll: false, url: 'https://github.com/DevOpsfirstBatch/jenkins-maven-pipeline.git'
+                
                 }
-            
             }
         }
-        
-        
-        stage('Build') {
-            steps {
-                dir("/var/lib/jenkins/workspace/New_demo/my-app/") {
-                sh 'mvn -B -DskipTests clean package'
-                }
-            
-            }
-        }
-     }
-    post {
-       always {
-          junit(
-        allowEmptyResults: true,
-        testResults: '*/test-reports/.xml'
-      )
-      }
-   } 
-}
+       
+    }
